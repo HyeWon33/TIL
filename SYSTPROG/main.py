@@ -1,9 +1,8 @@
-print("if statements")
-if 13 ** 3 > 50 **2:
-    print("13**2 > 50**2")
-elif 13 ** 3 != 2197:
-    print("13**3 != 2197")
-elif 13 ** 3 >= 30 **2:
-    print("13**3 >= 30**2")
-else:
-    print("13**3 < 30**2")
+from wave import Wave_write
+
+
+Lincoln_said = "for the people, by the people, of the people"
+print(Lincoln_said)
+We_say = Lincoln_said.replace("people", "python")
+print(We_say)
+print(We_say.split(","))
