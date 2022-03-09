@@ -231,41 +231,320 @@
 - 메시지 전송방식 자체는 비동기식인 토픽과 동일하다.
 - feedback은 액션의 goal을 정하는 action client와 목표에 맞추어 정해진 일을 수행하고 액션 피드백과 결과를 전달하는 action server 간의 비동기식 양방향 메시지 통신을 수행한다. 
 - 액션은 서비스와 달리 목푯값을 전달한 후, 임의의 시점에서 목표를 취소하는 명령어를 전달할 수 있는 기능도 갖고 있는 등 복잡한 로봇의 엄무를 지시하는데 많이 사용된다.
-- 
 
 
+
+- publishser, subscriber, service server, service client, action server, action client는 모두 각각 다른 노드 안에 존재하게 되는데 이러한 노드들이 메시지 통신을 하는 데에는 접속이 필요하다.
+- 이때 노드 간의 접속을 돕는 것이 마스터이다. 마스터는 노드의 이름, 토픽과 서비스, 액션의 이름 URI 주소와 포트, 파라미터 등의 네임 서버와 같은 역할을 한다.
+- 즉 노드는 생성과 동시에 마스터에 자신의 정보를 등록하고, 다른 노드가 마스터에 자신의 정보를 등록하고, 다른 노드가 마스터를 통해 접속하려는 노드의 정보를 마스터로부터 취득한다. 그런 다음, 노드와 노드가 직접 접속하여 메시지 통신을 수행한다. 
+- 그림 4-5 메시지 통신
 
 ### 4.2.4. 파라미터(parameter)
 
-
+- 메시지 통신에는 크게 토픽, 서비스, 액션으로 나뉘고 큰 틀에서 파라미터 또한 메시지 통신이라고 볼 수 있다.
+- 파라미터는 노드에서 사용되는 글로벌 변수라고 생각하면 된다.
+- 파라미터는 필요에 따라서 외부에서 이 매개변수를 읽거나 쓸 수 있다. 특히 외부에서 쓰기 기능을 이용하여 설정값을 실시간으로 바꿀 수 있기 때문에 상황에 따라 유연하게 대처할 수 있어서 매유 유용한 방법이다.
+- 파라미터는 엄밀히 따지면 메시지 통신은 아니지만 필자는 메시지를 이용한다는 점에서 메시지 통신 범위라고 본다.
 
 ### 4.2.5. 메세지 통신의 흐름
 
+- 마스터는 노드들의 정보를 관리하며, 각 노드는 필요에 따라 다른 노드와 접속, 메시지 통신을 수행한다.
 
+#### 마스터 구동
+
+- 노드 간의 메시지 통신에서 연결 정보를 관리하는 마스터는 ROS를 사용하기 위해서 제일 먼저 구동해야 하는 필수 요소이다.
+
+- roscore
+
+- XMLRPC로 서버를 구동한다.
+
+- 마스터는 노드 간의 접속을 위하여 노드들의 name, topic, service, action name, 메시지 형태, URI 주소와 포트를 등록받고, 요청이 있을 때 이 정보를 다른 노드에 알린다.
+
+- ```
+  $ roscore
+  ```
+
+#### 서브스크라이버 노드 구동
+
+- subscriber 노드는 구동과 함께 마스터에 자신의 서브스크라이버 노드 이름, 토픽 이름, 메시지 형태, URI 주소와 포트를 등록한다.
+
+- 마스터와 노드는 XMLRPC를 이용하여 통신한다.
+
+- ```
+  $ rosrun Package_Name Node_Name
+  $ roslaunch Package_Name Launch_Name
+  ```
+
+#### 퍼블리셔 노드 구동
+
+- publisher 노드는 구동과 함께 마스터에 자신읜 퍼브릴셔 노드 이름, 토픽 이름, 메시지 형태, URI 주소와 포트를 등록한다.
+- 마스터와 노드는 XMLRPC를 이용하여 통신한다.
+
+#### 퍼블리셔 정보 알림
+
+- 마스터는 서브스크라이버 노드에 서브스크라이버가 접속하기 원하는 퍼블리셔의 이름, 토픽 이름, 메시지 형태, URI 주소와 포트 등의 정보를 전송한다.
+
+#### 서브스크라이버 노드의 접속 요청
+
+- 서브스크라이버 노드는 마스터로부터 받은 퍼블리셔 정보를 기반으로 퍼블리셔 노드에 직접 접속을 요청한다.
+- 이때 전송하는 정보로는 자신의 서브스라이버 노드 이름, 토픽 이름, 메시지 방식이 있따.
+- 퍼블리셔 노드와 서브스크라이버 노드는 XMLRPC를 이용해 통신한다.
+
+#### 퍼블리셔 노드의 접속 응답
+
+- 퍼블리셔 노드는 서브스크라이버 노드에 접속 응답에 해당하는 자신의 TCP 서버의 정보인 URI 주소와 포트를 전송한다.
+- 퍼블리셔 녿으와 서브스크라이버 노드는 XMLRPC를 이용하여 통신한다.
+
+#### TCPROS 접속
+
+- 서브스크라이버 노드는 TCPROS를 이용하여 퍼블리셔 노드에 대한 클라이언트를 만들고, 퍼블리셔 노드와 직접 연결한다.
+
+#### 메시지 전송
+
+- 퍼블리셔 노드는 서브스크라이버 노드에 정해진 메시지를 전송한다.
+- 노드 간 통신은 TCPROS라는 TCP/IP 방식을 이용한다.
+
+#### 서비스 요청 및 응답
+
+- 앞서 설명한 내용은 메시지 통신 중에 토픽에 해당한다. 토픽 메시지 통신은 퍼블리셔나 서브스크라이버가 중지하지 않는 이상, 메시지를 연속해서 퍼블리시하고 서브스크라이브한다.
+- 서비스 클라이언트 : 서비스를 요청
+- 서비스 서버 : 서비스를 요청받아 정해진 프로세스를 수행하고 응답
+- 서비스 서버와 클라이언트의 접속은 TCPROS 접속과 같지만, 서비스는 토픽과 달리 1회에 한해 접속하여, 요청과 응답을 수행하고 서로의 접속을 끊는다. 다시 필요하면 접속부터 새롭게 진행해야 한다.
+
+#### 액션 목표, 결과, 피드백
+
+- 서비스의 요청과 응답의 중간 결괏값 전달용으로 피드백을 추가한 형태이지만 실제 구동 방식은 토픽과 같다.
+- 실제로 rostopic 명령어를 이용하여 토픽을 확인하면 액션은 goal, status, cancel, result, feedback과 같이 액션에서 사용하는 5개의 토픽을 확인할 수 있다.
+- TCPROS 접속과 같지만 액션 클라이언트에서 취소 명령을 보내거나 서버에서 결괏값을 보내주면 접속이 종료되는 등 사용법은 조금 상이하다.
+
+
+
+- 동작은 그림 4-12 TCP 접속 확인
 
 ## 4.3. 메세지
 
+- message는 노드 간에 데이터를 주고받을 때 사용하는 데이터의 형태이다.
 
+- 메시지는 단순한 자료형부터 'geometry_msgs/PoseStamped'와 같은 메시지 안에 메시지를 품고 있는 간단한 데이터 구조, 'float[] ranges' 같은 메시지들이 나열된 배열과 같은 구조도 사용할 수 있다. 더불어 ROS에서 많이 사용되는 헤더(Header, std_msgs/Header)도 메시지로 사용할 수 있다.
+
+- 이러한 메시지는 필드타입(fieldtype)과 필드네임(fieldname)으로 구성되어 있다.
+
+- ```
+  fieldtype1 fieldname1
+  fieldtype2 fieldname2
+  fieldtype3 fieldname3
+  ```
+
+- fieldtype에는 ROS의 자료형을 fieldname에는 데이터를 의미하는 이름을 적어주게 되어 있다.
+
+- ```
+  int32 x
+  int32 y
+  ```
+
+- 예
+
+  - Header, std_msgs/Header.msg
+
+    - ```
+      # 시퀀스 아이디 : 연속하여 증가하는 ID로 메시지가 차례대로 +1씩 증가한다.
+      uint32 seq
+      # 타임스탬프 : 초단위의 stamp.sec와 나노 초단위의 stamp.nsec의 2개의 하위 속성을 갖고 있다.
+      time stamp
+      # 프레임 아이디를 기재한다.
+      string frame_id
+      ```
+
+  - turtlesim 패키지의 teleop_turtle_key노드
+
+    - 실행된 후 입력되는 키보드의 방향키에 따라 turtlesim_node 노드에서 병진속도(meter/sec)와 회전속도(radian/sec)를 메시지로 전달하고 있다.
+
+    - 이 전달 받은 속도값을 이용하여 화면 속 터틀봇이 움직이게 된다.
+
+    - 이때 사용된 메시지는 geometry_msgs 중 Twist메시지다.
+
+      - ```
+        Vector3 linear
+        Vector3 angular
+        ```
+
+      - 이는 Vector3 메시지 형태로 linear와 angle 이름으로 선언해 두었다. 이는 메시지 안에 메시지 형태로 Vector3 메시지는 geometry_msgs 중의 하나이다. 다음은 Vector3의 형태이다.
+
+      - ```
+        float63 x
+        float63 y
+        float63 z
+        ```
+
+    - 즉 teleop_turtle_key 노드에서 퍼블리시되는 토픽은 linear.x, linear.y, linear.z, angular.x, angular.y, angular.z로 총 6개의 메시지가 있다.
+
+    - float64 형태이다. 이를 이용하여 키보드의 화살표가 병진속도와 회전속도 메시지로 전송하여 터틀봇이 구동할 수 있게 되었던 것이다.
 
 ### 4.3.1. msg 파일
 
+- msg파일은 토픽에 사용되는 메시지 파일로 *.msg라는 확장자를 이용한다.
 
+- msg파일은 fieldtype과 fieldname만으로 구성되어 있다.
+
+- geometry_msgs/Twist.msg
+
+  - ```
+    Vector3 linear
+    Vector3 angular
+    ```
 
 ### 4.3.2. srv 파일
 
+- srv 파일은 서비스에서 사용되는 메시지 파일로 확장자는 *.srv이다.
 
+- 예를 들어 sensor_msgs 중 SetCameraInfo메시지가 대표적인 srv 파일이다.
+
+- 하이픈(---)이 구분자 역살을 하여 상위 메시지가 서비스 오청 메시지, 하위 메시지가 서비스 응답 메시지로 사용된다.
+
+- sensor_msgs/SetCameraInfo.srv
+
+  - ```
+    sensor_msgs/CameraInfo camera_info #서비스 요청 메시지
+    ---
+    bool success #서비스 응답 메시지
+    string status_message
+    ```
 
 ### 4.3.3. action 파일
 
+- action 메시지 파일은 액션에서 사용되는 메시지 파일로 *.action이라는 확장지를 이용한다.
 
+- 비교적 많이 사용되는 메시지 파일이 아니라 대표적인 공식 메시지 파일은 없지만 다음 예제처럼 사용이 가능하다.
+
+- 3개의 하이픈(---)이 구분자 역할로 2군데 사용되어 첫 번째가 goal 메시지, 두 번째가 result 메시지, 세 번째가 feedback 메시지로 사용된다.
+
+- action 파일의 feedback 메시지는 지정된 프로세스가 수행되면서 중간 결괏값 전송 목적으로 이용한다는 것에 차이가 있다.
+
+- 예
+
+  - 로봇의 출발지점 start_pose와 목표지점 goal_pose의 위치와 자세를 요청값으로 전송하게 되면 로봇은 정해진 목표지점으로 이동하여 최종적으로 도달된 result_pose의 위치 자세값으로 전달한다. 더불어, 주기적으로 중간 결괏값으로 percent_complete 메시지로 목표지점까지의 도달 정도를 퍼센트로 전달하게 된다.
+
+  - ```
+    geometry_msgs/PoseStamped start_pose
+    geometry_msgs/PoseStamped goal_pose
+    ---
+    geometry_msgs.PoseStamped result_pose
+    ---
+    float32 percent_complete
+    ```
 
 ## 4.4. 네임(name)
+
+- ROS는 그래프(graph)라는 추상 데이터 형태(abstract data type)를 기본 콘셉트로 가지고 있다. 이는 각 노드들의 연결 관계를 나타내고 화살표로 메시지(데이터)를 주고받는 관계를 설명하게 된다.
+
+- 이를 위해 ROS에서 사용되는 노드, 토픽과 서비스에서 사용되는 메시지 그리고 파라미터는 모두 고유의 네임(name)을 가지도록 되어 있다.
+
+- 토픽의 네임은 상대적인 방법과 글로벌(global), 프리베이트(private)로 나뉘어 사용한다.
+
+- ```c++
+  //7장에서 자세히
+  
+  int main(int argc, char **argv) 	// 노드 메인 함수
+  {
+  	ros::init(argc, argv, "node1"); // 노드명 초기화
+      ros::NodeHandle nh;				// 노드 핸들 선언
+      // 퍼블리셔 선언, 토픽명 = bar
+      ros::Publisher node1_pub = nh.advertise<std_msgs::Int32>("bar", 10)
+  }
+  ```
+
+  - 노드명 : /node1이 된다. 그리고 아무런 문자를 붙이지 않고 상대적 형태인 bar로 퍼블리셔를 선언하게 되면 토픽은 /bar와 같은 네임을 가지게 된다.
+
+  - 만약에 슬래쉬(/) 문자로 글로벌로 사용하였다 하더라도 토픽 네임은 /bar가 된다.
+
+  - ```c++
+    ros::Publisher node1_pub = nh.advertise<std_msg::Int32>("/bar", 10);
+    ```
+
+  - 틸트(~) 문자를 이용하여 private로 선언하게 되면 토픽 네임은 /node1/bar가 된다.
+
+  - ```c++
+    ros::Publisher node1_pub = nh.advertise<std_msg::Int32>("~bar", 10);
+    ```
+
+  - 표 4-4 네임 규칙
+
+  - 두 대의 카메라를 구동하려면?
+
+    - 단순히 관련 노드를 두 번 실행하면 교유의 네임을 가져야하는 ROS의 특성상 이전에 실행한 노드가 종료하게 된다. 그렇다고 별도의 프로그램을 실행하거나 소스 코드를 변경하는 것이 아니라 노드를 실행할 때 노드의 이름을 변경하여 실행할 수 있다. 방법 : 네임스페이스(namespace)와 리맵핑(remapping)이 있다.
+
+    - 예
+
+      - 가상의 camera_package가 있다고 하자. 이 camera_package 패키지의 camera_node를 실행했을 때 camera 노드가 실행된다고 했을 때 이 구동 방법은 다음과 같다.
+
+        - ```
+          $ rosrun camera_package camera_node
+          ```
+
+      - 이 노드에서 카메라의 영상값을 image 토픽으로 전송한다고 했을 때, 다음과 같이 rqt_image_view를 통해서 이 image 토픽을 전송받을 수 있다.
+
+        - ```
+          $ rosrun rqt_image_view rqt_image_view
+          ```
+
+      - 이제 이 노드들의 토픽값을 리맵핑을 통해 수정해보자
+
+      - 다음과 같이 실행하게 되면 주고받는 토픽명만 /front/image로 변경된다.
+
+      - 여기서 image는 camera_node에서의 토픽명으로 이 토픽명과 관련된 두 노드의 실해오가 함께 옵션으로 네임을 변경하는 명령어의 예이다.
+
+        - ```
+          $ rosrun camera_package camera_node image:=front/image
+          $ rosrun rqt_image_view rqt_image_view image:=front/image
+          ```
+
+      - 예를 들어 front, left, right와 같이 카메라 3대가 있을 때, 이를 동일 이름으로 노드를 복수 실행할 때 노드의 고유 네임이 중복되어 전에 실행된 노드가 중단된다. 때문에 다음과 같은 방법으로 같은 이름이지만 복수 개의 다른 노드로 실행 가능하다.
+
+      - 여기서 name옵션에 밑줄(__)이 2개 사용되었는데 ...등의 옵션은 노드를 실행할 때 사용하는 특수 옵션이다. 그리고 토픽명의 옾션 앞에 밑줄 하나를 사용했는데 이는 private로 사용되는 네임일 경우 네임에 덧붙여 사용한다.
+
+        - ```
+          $ rosrun camera_package camera_node __name:=front _device:=/dev/video0 
+          $ rosrun camera_package camera_node __name:=left _device:=/dev/video1 
+          $ rosrun camera_package camera_node __name:=right _device:=/dev/video2
+          $ rosrun rqt_image_view rqt_image_view
+          ```
+
+      -  만약 하나의 네임스페이스로 묶어주고 싶다면 다음과 같이 하면 된다. 
+
+        - ```
+          $ rosrun camera_package camera_node __ns:=back
+          $ rosrun rqt_image_view rqt_image_view __ns:=back
+          ```
 
 
 
 ## 4.5. 좌표 변환(TF)
 
+- 로봇의 팔 자세를 설명할 때 각 관절(joint)들의 상대 좌표 변환으로 기술할 수 있다.
 
+- 로봇은 물체를 잡기 위하여 지도상에서 자신의 자세로부터 상대적으로 물체의 위치를 계산하여 잡을 수 있게 된다.
+
+- 이렇게 로봇 프로그래밍에서 좌표 변환을 통한 각 로봇의 관절(혹은 회전축 등을 갖는 바퀴) 및 물체의 위치는 매우 중요하며 ROS에서는 이를 TF(transform)로 표현하고 있다.
+
+- ROS에서 좌표 변환 TF는 로봇을 구성하는 각 부분 및 장애물과 물체들을 기술할 때 매우 유용한 개념 중에 하나이다.
+
+- 이들은 자세(pose)라 하여 위치(position)와 방향(orientation)으로 기술할 수 있다.
+
+- 여기서 위치는 x, y, z과 같이 3개의 벡터로 설명하고 방향은 사원수라 일컫는 쿼터니언(quaternion) 형태의 x, y, z, w를 이용한다. quaternion은 흔히 우리 생활에서 사용하는 각도 표현 형태인 롤(roll), 피치(pitch), 요(yaw)와 같이 3가지 축(x, y, z)의 회전으로 기술하는게 아니다 보니 직관적이지는 않다. 
+
+- 하지만 roll, pitch, yaw 벡터의 오일러(Euler) 방식이 갖는 짐벌락(gimbal lock) 문제나 속도 문제가 없어서 로보티긋에서는 기본적으로 쿼터니언(quaternion) 형태를 더 선호한다.
+
+- 물론 편의성을 고려하여 오일러 값을 쿼터니언으로 변환해주는 함수도 제공해주고 있다.
+
+- geometry_msgs/TransformStamped.msg
+
+  - ```
+    Header header
+    string child_frame_id
+    Transform transform
+    ```
+
+  - 변환된 시간을 기록할 목적으로 Header를 사용하며, 하위 좌표를 명시하기 위하여 child_frame_id라는 이름의 메시지를 사용한다. 그리고 상대 좌표 변환값을 알려주기 위하여 transform.translation.x / transform.translation.y / transform.translation.z / transform.rotation.x / transform.rotation.y / transform.rotation.z / transform.rotation.w 데이터 형태로 상대 위치와 방향을 기술하게 되어있다.
 
 ## 4.6. 클라이언트 라이브러리
 
