@@ -548,43 +548,246 @@
 
 ## 4.6. 클라이언트 라이브러리
 
-
+- 특성상 다양한 목적을 갖는 로봇을 지원하는 ROS는 이들의 언어들을 목적에 맞게 골라서 사용할 수 있도록 지원하고 있다.
+- 그 방법론으로 노드는 각각의 언어로 작성이 가능하고 노드 간의 메시지 통신을 통해 정보를 교환하는 방법을 이용하고 있다.
+- 이중 각각의 언어로 작성 가능하게 해주는 소프트웨어 모듈이 클라이언트 라이브러리(client library)이다.
+  - C++ - roscpp, Python - rospy ...
 
 ## 4.7. 이기종 디바이스 간의 통신
 
-
+- 2장에서 설명한 메타 운영체제, 4장에서 설명한 메시지 통신, 메시지, 네임, 좌표 변환, 클라이언트 라이브러리 등의 콘셉트를 통해 ROS는 이기종 디바이스 간의 통신을 기본적으로 지원한다.
+- ROS가 설치되어 사용하는 운영체제의 종류와도 상관없고, 사용하는 프로그래밍 언어도 상관없이 ROS가 설치되어 각 노드가 개발되었다면 각 노드들 간의 통신은 매우 쉽게 이용 가능하다.
+- 예를 들어 로봇에는 리눅스의 한 배포판인 우분투가 설치되어 있더라고, 개발자가 사용하는 MacOS에서 로봇의 상태를 모니터링 할 수 있다. 이와 동시에 사용자는 안드로이드 기반의 앱(APP)에서 로봇에게 명령을 내릴 수 있다.
 
 ## 4.8. 파일 시스템
 
-
-
 ### 4.8.1. 파일 구성
 
+- ROS에서 소프트웨어 구성을 위한 기본 단위는 package로써 ROS의 응용프로그램은 package단위로 개발된다.
+- package는 ROS에서 최소 단위의 실행 프로세서인 node를 하나 이상 포함하거나 다른 노드를 실행하기 위한 설정 파일들을 포함하게 된다.
+- 패키지는 메타패키지(metapackage)라는 공통된 목적을 지닌 패키지들을 모아둔 패키지들의 집합 단위로 관리되기도 한다.
+- 예를 들어 Navigation 메타패키지는 AMCL, DWA, EKF, map_server 등 10여 개의 패키지로 구성되어 있다. 
+- 각 패키지는 package.xml이라는 파일을 포함하고 있는데 이는 패키지의 정보를 담은 XML 파일로서 패키지 이름, 저작자, 라이선스, 의존성 패키지 등을 기술하고 있다.
+- ROS의 빌드 시스템인 캐킨은 기본적으로 CMake를 이용하고 있어서 패키지 폴더에 CMakeLists.txt라는 파일에 빌드 환경을 기술하고 있다.
+- 노드의 소스 코드 및 노드 간의 메시지 통신을 위한 메시지 파일 등으로 구성되어 있다.
 
+
+
+- ROS의 파일 시스템은 설치 폴더와 사용자 작업 폴더로 구분된다.
+  - ROS 설치 폴더는 ROS의 데스크톱 버전을 설치하면 /opt 폴더에 ros 이름으로 폴더가 생성되고 그 안에 roscore를 포함한 핵심 유틸리티와 rqt, RViz, 로봇 관련 라이브러리, 시뮬레이션, 내비게이션 등이 설치된다.
+  -  사용자 작업 폴더는 사용자가 원하는 곳에 폴더를 생성할 수 있는데 리눅스 사용자 폴더인 '~/catkin_ws/'('~/'은 리눅스에서 '/home/사용자명/'에 해당하는 폴더를 의미)를 사용하도록 하자.
 
 ### 4.8.2. 설치 폴더
 
+#### 파일 구성
 
+- '/opt/ros/kinetic'의 폴더 아래에 bin, etc, include, lib, share 폴더와 몇가지 환경설정 파일들로 구성되어 있다.
+
+#### 세부 내용
+
+- /bin : 실행 가능한 바이너리 파일
+- /etc : ROS 및 catkin 관련 설정 파일
+- /include : 헤더 파일
+- /lib : 라이브러리 파일
+- /share : ROS 패키지 
+- env.* : 환경설정 파일
+- setup.* : 환경설정 파일
 
 ### 4.8.3. 작업 폴더
 
+- 작업 폴더는 사용자가 원하는 곳에 생성할 수 있으나 이 책에서는 ~/catkin_ws/를 사용한다.
 
+#### 파일 구성
+
+- catkin_ws
+  - build
+  - devel
+  - src
+
+#### 세부 내용
+
+- 작업 폴더는 사용자가 작성한 패키지와 공개된 다른 개발자의 패키지를 저장하고 빌드하는 공간이다.
+- ROS와 관련된 대부분 작업을 이 폴더에서 수행한다.
+- /bulid : 빌드 관련 파일
+- /devel : msg, srv 헤더 파일과 사용자 패키지 라이브러리, 실행 파일
+- /src : 사용자 패키지
+
+#### 사용자 패키지
+
+- '~/catkin_ws/src' 폴더는 사용자 소스 코드의 공간이다. 이 폴더에서 사용자가 개발한 ROS 패키지나 다른 개발자가 개발한 패키지를 저장하고 빌드할 수 있다.
+- /include : 헤더파일
+- /launch : roslaunch에 사용되는 launch 파일
+- /node : rospy용 스크립트
+- /msg : 메시지 파일
+- /src : 코드 소스 파일
+- /srv : 서비스 파일
+- CMakeLists.txt : 빌드 설정 파일
+- package.xml : 패키지 설정 파일
 
 ## 4.9. 빌드 시스템
 
-
+- ROS의 빌드 시스템은 기본적으로 CMake(Cross Platform Make)를 사용하고 빌드 환경은 패키지 폴더의 CMakeList.txt 파일에 기술한다.
+- ROS에서는 CMake를 ROS에 맞도록 수정하여 ROS에 특화된 캐킨(catkin) 빌드 시스템을 제공한다.
+- ROS에서 CMake를 이용하는 이유는 ROS 패키지를 멀티 플랫폼에서 빌드할 수 있게 하기 위함이다.
+- 캐킨 빌드 시스템은 ROS와 관련된 빌드, 패키지 관리, 패키지간 의존관계 등을 편리하게 사용할 수 있도록 하고 있다.
 
 ### 4.9.1 패키지 생성
 
+- ```
+  $ catkin_create_pkg [패키지 이름] [의존하는패키지1] [의존하는패키지n]
+  ```
 
+  - 'catkin_create_pkg'는 사용자가 패키지를 작성할 떄 캐킨 빌드 시스템에 꼭 필요한 CMakeLists.txt와 package.xml을 포함한 패키지 폴더를 생성한다.
 
 ### 4.9.2. 패키지 설정 파일(package.xml) 수정
 
+- ROS의 필수 설정 파일 중 하나인 package.xml은 패키지의 정보를 담은 XML 파일로서 패키지의 이름, 저작자, 라이선스, 의존성 패키지 등을 기술하고 있다.
+- <?xml> : 문서 문법을 정의하는 문구로 아래의 내용은 xml 버전 1.0을 따르고 있다는 것을 알린다.
+- <package> : 이 구문부터 맨 끝의 </package>까지가 ROS 패키지 설정 부분이다.
+- <name> : 패키지의 이름이다. 패키지를 생성할 때 입력한 패키지 이름이 사용된다. 다른 옵션도 마찬가지지만 이는 사용자가 원할 때 언제든지 변경할 수 있다.
+- <version> : 패키지의 버전이다. 자유롭게 지정할 수 있다.
+- <description> : 패키지의 간단한 설명이다. 보통 2~3 분장으로 기술한다.
+- <maintainer> : 패키지 관리자의 이름과 이메일 주소를 기재한다.
+- <license> : 라이선스를 기재한다. BSD, MIT, Apache, GPLv3, LGPLv3 등을 기재하면 된다.
+- <url> : 패키지를 설명하는 웹 페이지 또는 버그 관리, 저장소 등의 주소를 기재한다. 이 종류에 따라 type에 website, bugtracker, repository를 대입하면 된다.
+- <author> : 패키지 개발에 참여한 개발자의 이름과 이메일 주소를 적는다. 복수의 개발자가 참여한 경우에는 바로 다음 줄에 <author> 태그를 이용하여 추가로 넣어주면 된다.
+- <buildtool_depend> : 빌드 시스템의 의존성을 기술한다. 지금은 캐킨 빌드 시스템을 이용하고 있으므로 catkin을 입력한다.
+- <build_depend> : 패키지를 빌드할 때 의존하는 패키지 이름을 적는다.
+- <run_depend> : 패키지를 실행할 때 의존한느 패키지 이름을 적는다.
+- <test_depend> : 패키지를 테스트할 때 의존하는 패키지 이름을 적는다.
+- <export> : ROS에서 명시하지 않은 태그명을 사용할 때 쓰인다. 제일 널리 쓰이는 것은 메타패키지일 때 <export><metapackage/X/export>와 같이 메타패키지임을 기술한다.
+- <metapackage> : export 태그 안에서 사용하는 공식적인 태그로 현재의 패키지가 메타패키지이면 이를 선언한다.
 
+- 책 83쪽에 예시가 있다.
 
 ### 4.9.3. 빌드 설정 파일(CMakeLists.txt) 수정
 
+- ROS의 빌드 시스템인 캐킨은 기본적으로 CMake를 이용하고 있어서 패키지 폴더의 CMakeLists.txt라는 파일에 빌드 환경을 기술하고 있다. 
 
+- 이는 실행 파일 생성, 의존성 패키지 우선 빌드, 링크 생성 등을 설정하게 되어 있다.
+
+- ```cmake
+  cmake_minimum_required(VERSION 2.8.3)
+  운영 체제에 설치된 cmake의 최소 요구 버전이다.
+  ```
+
+- ```cmake
+  project(my_first_ros_pkg)
+  패키지의 이름이다.
+  package.xml에서 입력한 패키지 이름을 그대로 사용해야 한다. 그렇지 않으면 빌드할 때 에러가 발생할 수 있다.
+  ```
+
+- ```cmake
+  find_package(catkin REQUIRED COMPONENTS
+    roscpp
+    std_msgs
+  )
+  캐킨 빌드를 할 때 요구되는 구성 요소 패키지이다.
+  현재 의존성 패키지로 roscpp, std_msgs가 추가되어 있다. 
+  여기에 입력된 패키지가 없다면 캐킨 빌드할 때 사용자에게 에러가 표시된다. 즉 사용자가 만든 패키지가 의존하는 다른 패키지를 먼저 설치하게 만드는 옵션이다.
+  ```
+
+- ```cmake
+  find_package(Boost REQUIRED COMPONENTS system)
+  ROS 이외의 패키지를 사용할 때 사용되는 방법이다. 
+  예를 들어 Boost를 사용할 때 system 패키지가 설치되어 있어야 한다.
+  ```
+
+- ```cmake
+  catkin_python_setup()
+  rospy를 사용할 때 설정하는 옵션이다.
+  파이썬 설치 프로세스인 setup.py를 부르는 역할을 한다.
+  ```
+
+- ```cmake
+  add_message_files(
+    FILES
+    Message1.msg
+    Message2.msg
+  )
+  메시지 파일을 추가하는 옵션이다.
+  FILES를 사용하면 현재 패키지 폴더의 msg 폴더 안에 .msg 파일들을 참조하여 헤더 파일(*.h)을 자동으로 생성하게 된다.
+  ```
+
+- ```cmake
+  add_service_files(
+   FILES
+   Service1.srv
+   Service2.srv
+  )
+  서비스 파일을 추가하는 옵션이다.
+  FILES를 사용하면 패키지 폴더의 srv 폴더 안의 .srv 파일들을 참조한다.
+  ```
+
+- ```cmake
+  generate_message(
+    DEPENDENCIES
+    std_msgs
+  )
+  의존하는 메시지를 설정하는 옵션이다.
+  이 예제는 DEPENDENCIES 옵션에 의해 std_msgs 메시지 패키지를 사용하겠다는 설정이다.
+  ```
+
+- ```cmake
+  generate_dynamic_reconfigure_options(
+    cfg/DynReconf1.cfg
+    cfg/DynReconf2.cfg
+  )
+  dynamic_reconfigure 사용할 때 참조하는 설정 파일을 불러오는 설정이다.
+  ```
+
+- ```cmake
+  catkin_package(
+    INCLUDE_DIRS include
+    LIBRARIES my_first_ros_pkg
+    CATKIN_DEPENDS roscpp std_msgs
+    DEPENDS system_lib
+  )
+  캐킨 빌드 옵션이다.
+  INCLUDE_DIRS는 뒤에 설정한 패키지 내부 폴더인 include 헤더파일을 사용하겠다는 설정이다.
+  LIBRARIES는 뒤에 설정한 패키지의 라이브러리를 사용하겠다는 설정이다.
+  CATKIN_DEPENDS 뒤에는 의존하는 패키지를 지정한다.
+  DEPENDS는 시스템 의존 패키지를 기술하는 설정이다.
+  ```
+
+- ```cmake
+  include_directories(
+    ${catkin_INCLUDE_DIRS}
+  )
+  인클루드 폴더를 지정할 수 있는 옵션이다.
+  ${catkin_INCLUDE_DIRS}라고 설정되어 있는데 이는 각 패키지 안의 include 폴더를 의미하고 이 안의 헤더 파일을 이용하겠다는 설정이다.
+  사용자가 추가로 인클루드 폴더를 지정할 때는 ${catkin_INCLUDE_DIRS} 아랫줄에 기재하면 된다.
+  ```
+
+- ```cmake
+  add_library(my_first_ros_pkg
+    src/${PROJECT_NAME}/my_first_pkg.cpp
+  )
+  빌드 후 생성할 라이브러리를 선언한다.
+  위 내용은 my_first_ros_pkg 패키지 src 폴더에 위치한 my_first_ros_pkg.cpp를 참조하여 my_first_ros_pkg 라이브러리를 생성하는 명령이다.
+  ```
+
+- ```cmake
+  add_dependencies(my_first_ros_pkg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+  해당 라이브러리 및 실행 파일을 빌드하기에 앞서 생성해야 할 의존성이 있는 메시지 및 dynamic rconfigure가 있으면 우선적으로 이를 수행하라는 설정이다.
+  위 내용은 위에서 언급한 my_first_ros_pkg 라이브러리에 의존성이있는 메시지 및 dynamic reconfigure
+  ```
+
+- ```cmake
+  add_executable(my_first_ros_pkg_node src/my_first_ros_pkg_node.cpp)
+  ```
+
+- ```cmake
+  add_dependencies(my_first_ros_pkg_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+  ```
+
+- ```cmake
+  target_link_libraries(my_first_ros_pkg_node
+    ${catkin_LIBRARIES}
+  )
+  ```
+
+- 
 
 ### 4.9.4. 소스 코드 작성
 
