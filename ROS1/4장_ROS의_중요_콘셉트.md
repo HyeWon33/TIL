@@ -770,32 +770,102 @@
 - ```cmake
   add_dependencies(my_first_ros_pkg ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
   해당 라이브러리 및 실행 파일을 빌드하기에 앞서 생성해야 할 의존성이 있는 메시지 및 dynamic rconfigure가 있으면 우선적으로 이를 수행하라는 설정이다.
-  위 내용은 위에서 언급한 my_first_ros_pkg 라이브러리에 의존성이있는 메시지 및 dynamic reconfigure
+  위 내용은 위에서 언급한 my_first_ros_pkg 라이브러리에 의존성이있는 메시지 및 dynamic reconfigure 생성을 우선적으로 진행하라는 옵션이다.
   ```
 
 - ```cmake
   add_executable(my_first_ros_pkg_node src/my_first_ros_pkg_node.cpp)
+  빌드 후 생성할 실행 파일에 대한 옵션을 지정한다.
+  위 내용은 src/my_first_ros_pkg_node.cpp 파일을 참조하여 my_first_ros_pkg_node 실행 파일을 실행하라는 내용이다.
+  만약 참조해야할 *.cpp 파일이 많은 경우 my_first_ros_pkg_node.cpp 뒤에 이어서 적어주고, 생성할 실행 파일이 2개 이상인 경우, add_executable 항목을 추가로 적어준다.
   ```
-
+  
 - ```cmake
   add_dependencies(my_first_ros_pkg_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+  앞서 설명한 add_dependencies와 마찬가지로 해당 라이브러리 및 실행 파일을 빌드하기에 앞서 생성해야 할 의존성이 있는 메시지 및 dynamic reconfigure가 있다면 우선적으로 이를 수행하라는 설정이다.
+  my_first_ros_pkg_node라는 실행 파일의 의존성을 기술한다.
+  흔히 실행 파일을 빌드하기 앞서 메시지 파일ㅇ르 우선 생성할 때 가장 많이 사용된다.
   ```
-
+  
 - ```cmake
   target_link_libraries(my_first_ros_pkg_node
     ${catkin_LIBRARIES}
   )
+  지정 실행 파일을 생성하기에 앞서 링크해야 하는 라이브러리와 실행 파일을 링크해주는 옵션이다.
   ```
-
-- 
+  
+- ```cmake
+  cmake_minimum_required(VERSION 2.8.3)
+  project(my_first_ros_pkg)
+  find_package(catkin REQUIRED COMPONENTS roscpp std_msgs)
+  catkin_package(CATKIN_DEPENDS roscpp std_msgs)
+  include_directories(${catkin_INCLUDE_DIRS})
+  add_excutable(hello_world_node src/hello_world_node.cpp)
+  target_link_libraries(hello_world_node ${catkin_LIBRARIES})
+  ```
 
 ### 4.9.4. 소스 코드 작성
 
+- CMakeLists.txt 파일의 실행 파일 생성 부분(add_executable)에서 다음과 같이 설정했다.
 
+  - ```cmake
+    add_excutable(hello_world_node src/hello_world_node.cpp)
+    ```
+
+- ```c++
+  //hello_world_node.cpp
+  
+  #include <ros/ros.h>
+  #include <std_msgs/String.h>
+  #inlcude <sstream>
+  
+  int main(int argc, char **argv){
+      ros::init(argc, argv, "hello_world_node");
+      ros::NodeHandle nh;
+      ros::Publisher chatter_pub = nh.advertise<std_msgs::String>("say_hello_world", 1000);
+      ros::Rate loop_rate(10);
+      int count = 0;
+      
+      while(ros::ok()){
+          std_msgs::String msg;
+          std::stringstream ss;
+          ss << "hello world" << count;
+          msg.data = ss.str();
+          ROS_INFO("%s", msg.data.c_str());
+          chatter_pub.publish(msg);
+          ros::spinOnce();
+          loop_rate.sleep();
+          ++count;
+      }
+      return 0;
+  }
+  ```
 
 ### 4.9.5. 패키지 빌드
 
+- ROS 패키지의 프로파일 을 갱신한다. 앞서 제작한 패키지를 ROS 패키지 목록에 반영하는 명령어로 필수 사항은 아니지만 새로운 패키지를 생성한 후에 갱신하면 이용하기 편하다.
 
+- ```
+  $ rospack profile
+  ```
+
+- 캐킨 빌드이다. 캐킨 작업 폴더로 이동하여 캐킨 빌드를 해주자.
+
+- ```
+  $ cd ~/catkin_ws && catkin_make
+  ```
 
 ### 4.9.6 노드 실행
 
+- ```
+  $ roscore
+  ```
+
+- ```
+  $ rosrun my_first_ros_pkg hello_world_node
+  ```
+
+
+
+표윤석, 조한철, 정려운, 임태훈. 『ROS 로봇 프로그래밍』
+https://book.naver.com/bookdb/book_detail.nhn?bid=12443870
