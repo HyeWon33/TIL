@@ -4,29 +4,28 @@
 
 # ### 1. 함수 정의
 
-from ast import Mult
 
 
-def mul_list(data, start_in, end_in, prin):
-    if end_in is None:
-        m_data = data[start_in:]
-    else:
-        m_data = data[start_in:end_in+1]
+# def mul_list(data, start_in, end_in, prin):
+#     if end_in is None:
+#         m_data = data[start_in:]
+#     else:
+#         m_data = data[start_in:end_in+1]
 
-    if start_in is None:
-        m_data = data[:end_in+1]
-    else:
-        m_data = data[start_in:end_in+1]
+#     if start_in is None:
+#         m_data = data[:end_in+1]
+#     else:
+#         m_data = data[start_in:end_in+1]
 
-    mul = 1
-    a = 0
-    for ind, num in enumerate(m_data):
-        mul*=num
+#     mul = 1
+#     a = 0
+#     for ind, num in enumerate(m_data):
+#         mul*=num
 
-    if prin:
-        print("m_data : ", m_data, "\nmul : ", mul)
+#     if prin:
+#         print("m_data : ", m_data, "\nmul : ", mul)
 
-    return mul
+#     return mul
 
 # # def main():
 # #     data = [2, 4, 6]
@@ -59,8 +58,8 @@ def mul_list(data, start_in, end_in, prin):
 
 # ### 3. 인자 기본값 지정
 
-def mul_list_with_default(data, start_in=0, end_in=0, prin=False):
-    return mul_list(data, start_in, end_in, prin)
+# def mul_list_with_default(data, start_in=0, end_in=0, prin=False):
+#     return mul_list(data, start_in, end_in, prin)
 
 # print("function default arguments")
 # avg = mul_list_with_default(data)
@@ -149,6 +148,24 @@ def mul_list_with_default(data, start_in=0, end_in=0, prin=False):
 
 ### 연습문제
 
+# def sum_list(list1, list2, shortlen, start=0, verbose=True):
+#     list1 = list1[start:]
+#     list2 = list2[start:]
+#     if shortlen is False:
+#         short = list1 if len(list1) < len(list2) else list2
+#         longl = list2 if len(list1) < len(list2) else list1
+#         for i in range(len(longl) - len(short)):
+#             short.append(0)
+#         sum_result = [s+l for s, l in zip(short, longl)]
+#     else:
+#         sum_result = [s+l for s, l in zip(list1, list2)]
+#     if verbose:
+#         print(f"{list1} * {list2} = {sum_result}")
+#     return sum_result
+
+# sum_list([1,2,3], [2,3,4,5,6], True)
+# sum_list([1,2,3,], [2,3,4,5,6], False)
+
 ### 5. 변수 범위(Scope)
 
 # global_num = 5
@@ -191,27 +208,27 @@ def mul_list_with_default(data, start_in=0, end_in=0, prin=False):
 ### 6. 바람직한 파이썬 코딩 스타일
 
 # def main():
-#     data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-#     result = average_keyworded_args(data, 10, start=1, skip=[2, 3])
-#     print("average_keyworded_args(data, start=1, skip=[2, 3]) =>", result)
-#     result = average_keyworded_args(data, 10, start=1, end=7)
-#     print("average_keyworded_args(data, start=1, end=7) =>", result)
+#     data_lis = [2, 4, 6, 8, 10, 1, 2, 3, 4, 5]
+#     result = average_keyworded_args(data_lis, 10, start=1, skip=[2, 3])
+#     print(f"average_keyworded_args(data_lis, start=1, skip=[2, 3]) => {result}")
+#     result = average_keyworded_args(data_lis, 10, start=1, end=7)
+#     print(f"average_keyworded_args(data_lis, start=1, end=7) => {result}")
 
-# def average_keyworded_args(data, multiple, **kwargs):
-#     data = [d*multiple for d in data]
-#     avg = average_list_with_default(data, **kwargs)
+# def average_keyworded_args(data_lis, multiple, **kwargs):
+#     data_lis = [d*multiple for d in data_lis]
+#     avg = average_list_with_default(data_lis, **kwargs)
 #     return avg
 
-# def average_list_with_default(data, start=0, end=None, skip=None, verbose=False):
+# def average_list_with_default(data_lis, start=0, end=None, skip=None, verbose=False):
 #     if skip is None:
 #         skip = []
-#     return average_list(data, start, end, skip, verbose)
+#     return average_list(data_lis, start, end, skip, verbose)
 
-# def average_list(data, start, end, skip, verbose):
+# def average_list(data_lis, start, end, skip, verbose):
 #     if end is None:
-#         avg_data = data[start:]
+#         avg_data = data_lis[start:]
 #     else:
-#         avg_data = data[start:end]
+#         avg_data = data_lis[start:end]
 
 #     sum = 0
 #     for ind, num in enumerate(avg_data):
@@ -409,14 +426,27 @@ def mul_list_with_default(data, start_in=0, end_in=0, prin=False):
 
 ### 연습문제
 
+# matrix_str = "4 2\n5 3"
+# with open("matrix.txt", "w") as f:
+#     f.write(matrix_str)
+
 # with open("matrix.txt", "r") as f:
 #     data = f.readlines()
 
 # data = [d.rstrip("\n") for d in data]
 # data = [d.split() for d in data]
+
 # data = [[int(elem) for elem in row] for row in data]
+# # ↓↓
+# # numdata = []
+# # for row in data:
+# #     numrow = [int(elem) for elem in row]
+# #     numdata.append(numrow)
+
 # print(data)
+
 # determinant = data[0][0] * data[1][1] - data[0][1] * data[1][0]
+    
 # print("determinant : ", determinant)
 
 
@@ -425,32 +455,32 @@ def mul_list_with_default(data, start_in=0, end_in=0, prin=False):
 ### 2. 모듈 만들기
 
 # list_ops.py
-def add(foo, bar):
-    re = []
-    for f, b in zip(foo, bar):
-        re.append(f + b)
-    return re
+# def add(foo, bar):
+#     re = []
+#     for f, b in zip(foo, bar):
+#         re.append(f + b)
+#     return re
 
-def subtract(foo, bar):
-    re = []
-    for f, b in zip(foo, bar):
-        re.append(f - b)
-    return re
+# def subtract(foo, bar):
+#     re = []
+#     for f, b in zip(foo, bar):
+#         re.append(f - b)
+#     return re
 
-def multiply(foo, bar):
-    re = []
-    for f, b in zip(foo, bar):
-        re.append(f * b)
-    return re
+# def multiply(foo, bar):
+#     re = []
+#     for f, b in zip(foo, bar):
+#         re.append(f * b)
+#     return re
 
-def divide(foo, bar):
-    re = []
-    for f, b in zip(foo, bar):
-        re.append(f / b)
-    return re
+# def divide(foo, bar):
+#     re = []
+#     for f, b in zip(foo, bar):
+#         re.append(f / b)
+#     return re
 
-spam = [11, 22]
-ham = [33, 44]
+# spam = [11, 22]
+# ham = [33, 44]
 # if __name__ == '__main__':
 #     eggs = add(spam, ham)
 
@@ -510,3 +540,186 @@ ham = [33, 44]
 
 ### 3. 패키지 만들기
 
+# # dict_ops.py
+# def add_op(foo, bar):
+#     out = {}
+#     for key in foo:
+#         if key in bar:
+#             out[key] = foo[key] + bar[key]
+#     return out
+
+# def subtract_op(foo, bar):
+#     out = {}
+#     for key in foo:
+#         if key in bar:
+#             out[key] = foo[key] - bar[key]
+#     return out
+
+# def multiply_op(foo, bar):
+#     out = {}
+#     for i, key in enumerate(foo):
+#         if key in bar:
+#             out[i] = foo[i] * bar[i]
+#     return out
+
+# def divide_op(foo, bar):
+#     out = {}
+#     for i, key in enumerate(foo):
+#         out[i] = foo[i] / bar[i]
+#     return out
+
+#use_package.py
+# #원래대로 패키지를 만들고 했으면 import를 해줘야 하는데 과제제출을 위해 한 코드에 작성했습니다.
+# # import package.list_ops as lo
+# # import package.dict_ops as do
+
+# #위의 함수명 앞세 as로 설정한 변수를 써줘야 합니다. 
+# #예를들어 lo.multiply_op()이렇게 써줘야 하는데 한 코드에 작성하다보니 분리해서 실행할 때 없던 에러가 생겨서 코드를 수정했습니다.
+# #TypeError: list indices must be integers or slices, not float 이런 에러때문에 리스트를 enumerate하고 나온 딕셔너리를 다시 리스트를 바꿔주는 코드를 작성했습니다.
+
+# weights_bmi = [65, 90, 42, 76]
+# heights_bmi = [1.65, 1.78, 1.59, 1.80]
+# heights_sq = multiply_op(heights_bmi, heights_bmi)
+# heights_sq = list(heights_sq.values())
+# bmi = divide_op(weights_bmi, heights_sq)
+# bmi = list(bmi.values())
+# print("BMI:", bmi)
+
+
+
+
+# # dict_ops.py
+# def add_op(foo, bar):
+#     out = {}
+#     for key in foo:
+#         if key in bar:
+#             out[key] = foo[key] + bar[key]
+#     return out
+
+# def subtract_op(foo, bar):
+#     out = {}
+#     for key in foo:
+#         if key in bar:
+#             out[key] = foo[key] - bar[key]
+#     return out
+
+# def multiply_op(foo, bar):
+#     out = {}
+#     for key in foo:
+#         if key in bar:
+#             out[key] = foo[key] * bar[key]
+#     return out
+
+# def divide_op(foo, bar):
+#     out = {}
+#     for key in foo:
+#         if key in bar:
+#             out[key] = foo[key] / bar[key]
+#     return out
+
+# #use_package.py
+# weights_bmi = [65, 90, 42, 76]
+# heights_bmi = [1.65, 1.78, 1.59, 1.80]
+# w_names = ["RM", "Suga", "Jin", "V"]
+# h_names = ["Jimin", "RM", "Suga", "Jin"]
+# weights = dict(zip(w_names, weights_bmi))
+# heights = dict(zip(h_names, heights_bmi))
+# print("dict weights:", weights)
+# print("dict heights:", heights)
+# heights_sq = multiply_op(heights, heights)
+# bmi = divide_op(weights, heights_sq)
+# print("BMI:", bmi)
+
+
+
+### 연습문제
+
+#iter_ops
+
+#dict_ops
+# def add(foo, bar):
+#     return {fkey: foo[fkey] + bar[fkey] for fkey in foo if fkey in bar}
+
+# def subtract(foo, bar):
+#     return {fkey: foo[fkey] - bar[fkey] for fkey in foo if fkey in bar}
+
+# def multiply(foo, bar):
+#     return {fkey: foo[fkey] * bar[fkey] for fkey in foo if fkey in bar}
+
+# def divide(foo, bar):
+#     return {fkey: foo[fkey] / bar[fkey] for fkey in foo if fkey in bar}
+
+# #list_ops
+# def add(foo, bar):
+#     return [f+b for f, b in zip(foo, bar)]
+
+# def subtract(foo, bar):
+#     return [f-b for f, b in zip(foo, bar)]
+
+# def multiply(foo, bar):
+#     return [f*b for f, b in zip(foo, bar)]
+
+# def divide(foo, bar):
+#     return [f/b for f, b in zip(foo, bar)]
+
+
+# def check_prime_number(numbers):
+#     out = []
+#     for i in numbers:
+#         for j in range(2, i):
+#             if i % j == 0:
+#                 out.append(False)
+#                 break
+#             out.append(True)
+#             break
+#     return out
+
+
+# def main():
+#     lis = [341, 12, 523, 59]
+#     print(check_prime_number(lis))
+
+# if __name__ == "__main__":
+#     main()
+
+
+
+
+
+
+
+
+
+# 4.2 **kwargs
+
+def aver_list(data, start, end, skip, verbose):
+    if end is None:
+        avg_data = data[start:]
+    else:
+        avg_data = data[start:end]
+
+    sum = 0
+    for ind, num in enumerate(avg_data):
+        if ind + start not in skip:
+            sum += num
+    dlen = len(avg_data) - len(skip)
+    average = sum / dlen
+
+    return average
+
+def aver_list_with_default(data, start=0, end=None, skip=None, verbose=False):
+    if skip is None:
+        skip = []
+    return aver_list(data, start, end, skip, verbose)
+
+def aver_keyworded_args(data, multiple, **kwargs):
+    print("[average_subjects_varargs] kwargs:", kwargs)
+    data = [d*multiple for d in data]
+    avgverage = aver_list_with_default(data, **kwargs)
+    return avgverage
+
+data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+result = aver_keyworded_args(data, 10, start=1, skip=[2, 3], end=2)
+print("aver_keyworded_args(data, start=1, skip=[2, 3], end=2) =>", result)
+result = aver_keyworded_args(data, 5, start=1, end=7)
+print("aver_keyworded_args(data, start=1, end=7) =>", result)

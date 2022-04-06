@@ -29,3 +29,12 @@
 #연습문제
 def add(foo, bar):
     return {fkey: foo[fkey] + bar[fkey] for fkey in foo if fkey in bar}
+
+def subtract(foo, bar):
+    return {fkey: foo[fkey] - bar[fkey] for fkey in foo if fkey in bar}
+
+def multiply(foo, bar):
+    return {fkey: foo[fkey] * bar[fkey] for fkey in foo if fkey in bar}
+
+def divide(foo, bar):
+    return {fkey: foo[fkey] / bar[fkey] for fkey in foo if fkey in bar}
