@@ -36,4 +36,41 @@
 
 
 
-## 076
+## 076 
+
+# # 튜플의 값은 변경할 수 없기 때문에, 리스트와 달리 t[0] = 'A'는 동작하지 않고 새로운 튜플 t를 만든다.
+# t = ('A', 'b', 'c')
+# print(t)
+
+
+
+## 077 튜플을 리스트로
+
+# interest = ('삼성전자', 'LG전자', 'SK Hynix')
+# interest_lis = list(interest)
+# print(interest_lis)
+
+
+
+## 078 리스트를 튜플로
+
+# interest = ['삼성전자', 'LG전자', 'SK Hynix']
+# interest_tup = tuple(interest)
+# print(interest_tup)
+
+
+
+## 079 튜플 언팩킹
+
+# temp = ('apple', 'banana', 'cake')
+# a, b, c = temp
+# print(a, b, c)
+# # 튜플이 풀리나?
+# # 풀리네..
+
+
+
+## 080 range 함수 ***********
+
+# data = tuple(range(2, 100, 2))
+# print(data)
