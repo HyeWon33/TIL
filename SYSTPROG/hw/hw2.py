@@ -692,7 +692,43 @@
 
 # 4.2 **kwargs
 
-def aver_list(data, start, end, skip, verbose):
+# def aver_list(data, start, end, skip, verbose):
+#     if end is None:
+#         avg_data = data[start:]
+#     else:
+#         avg_data = data[start:end]
+
+#     sum = 0
+#     for ind, num in enumerate(avg_data):
+#         if ind + start not in skip:
+#             sum += num
+#     dlen = len(avg_data) - len(skip)
+#     average = sum / dlen
+
+#     return average
+
+# def aver_list_with_default(data, start=0, end=None, skip=None, verbose=False):
+#     if skip is None:
+#         skip = []
+#     return aver_list(data, start, end, skip, verbose)
+
+# def aver_keyworded_args(data, multiple, **kwargs):
+#     print("[average_subjects_varargs] kwargs:", kwargs)
+#     data = [d*multiple for d in data]
+#     avgverage = aver_list_with_default(data, **kwargs)
+#     return avgverage
+
+# data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+# result = aver_keyworded_args(data, 10, start=1, skip=[2, 3], end=2)
+# print("aver_keyworded_args(data, start=1, skip=[2, 3], end=2) =>", result)
+# result = aver_keyworded_args(data, 5, start=1, end=7)
+# print("aver_keyworded_args(data, start=1, end=7) =>", result)
+
+
+
+## funciton.. 연습문제
+
+def average_list(data, start, end, skip, verbose):
     if end is None:
         avg_data = data[start:]
     else:
@@ -704,22 +740,50 @@ def aver_list(data, start, end, skip, verbose):
             sum += num
     dlen = len(avg_data) - len(skip)
     average = sum / dlen
-
+    if verbose:
+        print(f"average over indices [{start}~{end}) with skipping index {skip} = {average}")
     return average
 
-def aver_list_with_default(data, start=0, end=None, skip=None, verbose=False):
+
+def average_list_with_default(data, start=0, end=None, skip=None, verbose=False):
     if skip is None:
         skip = []
-    return aver_list(data, start, end, skip, verbose)
+    return average_list(data, start, end, skip, verbose)
 
-def aver_keyworded_args(data, multiple, **kwargs):
+
+def average_multi_subjects(scores, *args):
+    averages = {}
+    print("[average_multi_subjects] args:", args)
+    print("[average_multi_subjects] *args:", *args)
+    for subject in args:
+        avg = average_list_with_default(scores[subject], verbose=False)
+        print(f"average over {subject} scores: {avg:.1f}")
+        averages[subject] = avg
+    return averages
+
+
+def average_keyworded_args(data, multiple, **kwargs):
     print("[average_subjects_varargs] kwargs:", kwargs)
     data = [d*multiple for d in data]
-    avgverage = aver_list_with_default(data, **kwargs)
-    return avgverage
+    avg = average_list_with_default(data, **kwargs)
+    return avg
 
-data = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-result = aver_keyworded_args(data, 10, start=1, skip=[2, 3], end=2)
-print("aver_keyworded_args(data, start=1, skip=[2, 3], end=2) =>", result)
-result = aver_keyworded_args(data, 5, start=1, end=7)
-print("aver_keyworded_args(data, start=1, end=7) =>", result)
+def average_subjects_kwargs(scores, multiple, *args, **kwargs):
+    avger = {}
+    print("[average_multi_subjects] *args : ", *args)
+    for subject in args:
+        scores[subject] = [d*multiple for d in scores[subject]]
+        avg = average_list_with_default(scores[subject], verbose=False, **kwargs)
+        print(f"average over {subject} scores  : {avg:.1f}")
+        avger[subject] = avg
+    return avger
+
+def main():
+    subject_scores = {"cpp": [57, 36, 80, 53, 23], "java": [46, 88, 72, 15, 54], "ruby": [85, 23, 34, 91, 42]}
+
+    result = average_subjects_kwargs(subject_scores, 10, "cpp", "java", start=1, end=4, skip=[2])
+    print(result)
+
+
+if __name__ == '__main__':
+    main()
